@@ -1,0 +1,39 @@
+{
+  "name": "alaryc",
+  "version": "1.0.0",
+  "description": "Application mobile pour parents d'enfants avec besoins particuliers",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject",
+    "test": "jest"
+  },
+  "dependencies": {
+    "expo": "^50.0.0",
+    "expo-status-bar": "~1.11.1",
+    "react": "18.2.0",
+    "react-native": "0.73.2",
+    "react-navigation": "^6.1.9",
+    "react-navigation-bottom-tabs": "^6.5.11",
+    "react-navigation-native": "^6.1.9",
+    "react-navigation-stack": "^6.3.20",
+    "expo-constants": "~15.4.0",
+    "expo-font": "~11.10.3",
+    "expo-splash-screen": "~0.26.4",
+    "firebase": "^10.7.0",
+    "react-native-screens": "~3.29.0",
+    "react-native-safe-area-context": "4.8.2",
+    "react-native-gesture-handler": "~2.14.0",
+    "date-fns": "^2.30.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@testing-library/react-native": "^12.0.0",
+    "jest": "^29.0.0"
+  },
+  "private": true
+}
