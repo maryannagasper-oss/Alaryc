@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alaryc - Agenda pour enfants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F8F9FA;
+            color: #1F2937;
+        }
+
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1F2937;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .moods {
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+        }
+
+        .mood-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            background: #F9FAFB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mood-btn:hover,
+        .mood-btn.active {
+            border-color: #6366F1;
+            background: #EEF2FF;
+            transform: scale(1.05);
+        }
+
+        .mood-label {
+            font-size: 10px;
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+        .routine-item,
+        .appointment-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #F9FAFB;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .item-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: 500;
+            color: #1F2937;
+            margin-bottom: 2px;
+        }
+
+        .item-time {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #E5E7EB;
+            background: white;
+            position: sticky;
+            bottom: 0;
+            padding: 8px 0;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 12px;
+            color: #9CA3AF;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            color: #6366F1;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+            padding-bottom: 60px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .child-info {
+            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .child-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .child-age {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .pathologies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .pathology-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .action-card {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: white;
+            border-left: 4px solid #6366F1;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-card:hover {
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .action-icon {
+            font-size: 28px;
+            margin-right: 12px;
+        }
+
+        .action-text {
+            font-weight: 500;
+            color: #1F2937;
+        }
+
+        .resource-card {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .resource-emoji {
+            font-size: 32px;
+            margin-right: 12px;
+        }
+
+        .resource-title {
+            font-weight: 500;
+            color: #1F2937;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .setting-label {
+            font-weight: 500;
+            color: #1F2937;
+        }
+
+        .setting-value {
+            font-size: 14px;
+            color: #6B7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🌟 Alaryc</h1>
+            <p>Agenda pour enfants</p>
+        </div>
+
+        <!-- CONTENU -->
+        <div class="content">
+            <!-- TAB 1: ACCUEIL -->
+            <div class="tab-content active" id="home">
+                <div class="section">
+                    <div class="section-title">📊 Humeur du jour</div>
+                    <div class="moods">
+                        <button class="mood-btn" onclick="setMood('happy')">
+                            😊
+                            <span class="mood-label">Heureux</span>
+                        </button>
+                        <button class="mood-btn" onclick="setMood('neutral')">
+                            😐
+                            <span class="mood-label">Neutre</span>
+                        </button>
+                        <button class="mood-btn" onclick="setMood('sad')">
+                            😢
+                            <span class="mood-label">Triste</span>
+                        </button>
+                        <button class="mood-btn" onclick="setMood('angry')">
+                            😠
+                            <span class="mood-label">Fâché</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">⚡ Actions rapides</div>
+                    <div class="action-card" onclick="showAlert('Rendez-vous d\'aujourd\'hui')">
+                        <span class="action-icon">📅</span>
+                        <span class="action-text">Rendez-vous d'aujourd'hui</span>
+                    </div>
+                    <div class="action-card" onclick="showAlert('Routines du jour')">
+                        <span class="action-icon">⏰</span>
+                        <span class="action-text">Routines du jour</span>
+                    </div>
+                    <div class="action-card" onclick="showAlert('Suivi des progrès')">
+                        <span class="action-icon">✅</span>
+                        <span class="action-text">Suivi des progrès</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">👧 Profil de l'enfant</div>
+                    <div class="child-info">
+                        <div class="child-name">Marie Gasper</div>
+                        <div class="child-age">7 ans</div>
+                        <div class="pathologies">
+                            <span class="pathology-tag">Dyslexie</span>
+                            <span class="pathology-tag">TDAH</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: AGENDA -->
+            <div class="tab-content" id="agenda">
+                <div class="section">
+                    <div class="section-title">📅 Rendez-vous</div>
+                    <div class="appointment-item">
+                        <span class="item-icon">🏥</span>
+                        <div class="item-content">
+                            <div class="item-title">Rendez-vous psychologue</div>
+                            <div class="item-time">Clinique ABC - 10:00</div>
+                        </div>
+                    </div>
+                    <div class="appointment-item">
+                        <span class="item-icon">🧠</span>
+                        <div class="item-content">
+                            <div class="item-title">Séance d'orthophonie</div>
+                            <div class="item-time">Centre de rééducation - 14:30</div>
+                        </div>
+                    </div>
+                    <div class="appointment-item">
+                        <span class="item-icon">👨‍⚕️</span>
+                        <div class="item-content">
+                            <div class="item-title">Contrôle médical</div>
+                            <div class="item-time">Cabinet médical - 15:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: ROUTINES -->
+            <div class="tab-content" id="routines">
+                <div class="section">
+                    <div class="section-title">⏰ Routines</div>
+                    <div class="routine-item">
+                        <span class="item-icon">🥣</span>
+                        <div class="item-content">
+                            <div class="item-title">Petit-déjeuner</div>
+                            <div class="item-time">08:00</div>
+                        </div>
+                    </div>
+                    <div class="routine-item">
+                        <span class="item-icon">🎒</span>
+                        <div class="item-content">
+                            <div class="item-title">Préparation école</div>
+                            <div class="item-time">08:30</div>
+                        </div>
+                    </div>
+                    <div class="routine-item">
+                        <span class="item-icon">🏠</span>
+                        <div class="item-content">
+                            <div class="item-title">Retour école</div>
+                            <div class="item-time">16:30</div>
+                        </div>
+                    </div>
+                    <div class="routine-item">
+                        <span class="item-icon">🍎</span>
+                        <div class="item-content">
+                            <div class="item-title">Goûter</div>
+                            <div class="item-time">17:00</div>
+                        </div>
+                    </div>
+                    <div class="routine-item">
+                        <span class="item-icon">🛏️</span>
+                        <div class="item-content">
+                            <div class="item-title">Coucher</div>
+                            <div class="item-time">20:30</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: RESSOURCES -->
+            <div class="tab-content" id="resources">
+                <div class="section">
+                    <div class="section-title">📚 Ressources</div>
+                    <div class="resource-card">
+                        <span class="resource-emoji">📖</span>
+                        <span class="resource-title">Comprendre le TDAH</span>
+                    </div>
+                    <div class="resource-card">
+                        <span class="resource-emoji">🧘</span>
+                        <span class="resource-title">Techniques de relaxation</span>
+                    </div>
+                    <div class="resource-card">
+                        <span class="resource-emoji">🎨</span>
+                        <span class="resource-title">Activités créatives</span>
+                    </div>
+                    <div class="resource-card">
+                        <span class="resource-emoji">🎮</span>
+                        <span class="resource-title">Jeux éducatifs</span>
+                    </div>
+                    <div class="resource-card">
+                        <span class="resource-emoji">📱</span>
+                        <span class="resource-title">Apps recommandées</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: PARAMÈTRES -->
+            <div class="tab-content" id="settings">
+                <div class="section">
+                    <div class="section-title">⚙️ Paramètres</div>
+                    <div class="setting-item">
+                        <span class="setting-label">Profil</span>
+                        <span class="setting-value">Marie Gasper</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Notifications</span>
+                        <span class="setting-value">Activées</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Langue</span>
+                        <span class="setting-value">Français</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Thème</span>
+                        <span class="setting-value">Clair</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Version</span>
+                        <span class="setting-value">1.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('home')">🏠 Accueil</button>
+            <button class="nav-tab" onclick="switchTab('agenda')">📅 Agenda</button>
+            <button class="nav-tab" onclick="switchTab('routines')">⏰ Routines</button>
+            <button class="nav-tab" onclick="switchTab('resources')">📚 Ressources</button>
+            <button class="nav-tab" onclick="switchTab('settings')">⚙️ Paramètres</button>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Masquer tous les onglets
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Masquer tous les boutons actifs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+
+            // Afficher l'onglet sélectionné
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function setMood(mood) {
+            const moods = {
+                'happy': '😊',
+                'neutral': '😐',
+                'sad': '😢',
+                'angry': '😠'
+            };
+
+            // Supprimer la classe active de tous les boutons
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Ajouter la classe active au bouton cliqué
+            event.target.closest('.mood-btn').classList.add('active');
+
+            console.log('Humeur sélectionnée:', mood);
+        }
+
+        function showAlert(message) {
+            alert(message);
+        }
+    </script>
+</body>
+</html>
