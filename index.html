@@ -138,11 +138,13 @@
             position: sticky;
             bottom: 0;
             padding: 8px 0;
+            overflow-x: auto;
         }
 
         .nav-tab {
             flex: 1;
-            padding: 12px;
+            min-width: 80px;
+            padding: 12px 8px;
             text-align: center;
             cursor: pointer;
             border: none;
@@ -150,6 +152,7 @@
             font-size: 12px;
             color: #9CA3AF;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .nav-tab.active {
@@ -262,6 +265,315 @@
         .setting-value {
             font-size: 14px;
             color: #6B7280;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .setting-value:hover {
+            background: #EEF2FF;
+            color: #6366F1;
+        }
+
+        .edit-btn {
+            background: #6366F1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            background: #4F46E5;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 24px;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1F2937;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #1F2937;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #6366F1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #6366F1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4F46E5;
+        }
+
+        .btn-secondary {
+            background: #E5E7EB;
+            color: #1F2937;
+        }
+
+        .btn-secondary:hover {
+            background: #D1D5DB;
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #F9FAFB;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .document-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .document-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .document-details {
+            flex: 1;
+        }
+
+        .document-name {
+            font-weight: 500;
+            color: #1F2937;
+            margin-bottom: 2px;
+        }
+
+        .document-date {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .document-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .document-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .upload-zone {
+            border: 2px dashed #6366F1;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+
+        .upload-zone:hover {
+            background: #EEF2FF;
+        }
+
+        .upload-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .pathology-input {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .pathology-input input {
+            flex: 1;
+        }
+
+        .add-pathology-btn {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .add-pathology-btn:hover {
+            background: #059669;
+        }
+
+        .pathology-tag-edit {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #DBEAFE;
+            color: #1E40AF;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 8px;
+            width: fit-content;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #1E40AF;
+        }
+
+        .share-input {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .share-input input {
+            flex: 1;
+        }
+
+        .share-btn {
+            background: #6366F1;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .share-btn:hover {
+            background: #4F46E5;
+        }
+
+        .shared-with {
+            background: #F9FAFB;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .shared-person {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .shared-person:last-child {
+            border-bottom: none;
+        }
+
+        .person-name {
+            font-weight: 500;
+            color: #1F2937;
+        }
+
+        .remove-access {
+            background: none;
+            border: none;
+            color: #EF4444;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -318,9 +630,9 @@
                 <div class="section">
                     <div class="section-title">👧 Profil de l'enfant</div>
                     <div class="child-info">
-                        <div class="child-name">Marie Gasper</div>
-                        <div class="child-age">7 ans</div>
-                        <div class="pathologies">
+                        <div class="child-name" id="childNameDisplay">Marie Gasper</div>
+                        <div class="child-age" id="childAgeDisplay">7 ans</div>
+                        <div class="pathologies" id="pathologiesDisplay">
                             <span class="pathology-tag">Dyslexie</span>
                             <span class="pathology-tag">TDAH</span>
                         </div>
@@ -425,81 +737,381 @@
                 </div>
             </div>
 
-            <!-- TAB 5: PARAMÈTRES -->
+            <!-- TAB 5: PARTAGE DE DOCUMENT -->
+            <div class="tab-content" id="documents">
+                <div class="section">
+                    <div class="section-title">📤 Partage de document</div>
+                    
+                    <div class="card">
+                        <h3 style="margin-bottom: 12px; color: #1F2937;">📤 Uploader un document</h3>
+                        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">📁</div>
+                            <div class="upload-text">Cliquez pour uploader un document</div>
+                        </div>
+                        <input type="file" id="fileInput" style="display: none;" onchange="addDocument(event)">
+                        
+                        <div id="documentList">
+                            <div class="document-item">
+                                <div class="document-info">
+                                    <span class="document-icon">📄</span>
+                                    <div class="document-details">
+                                        <div class="document-name">Rapport psychologue.pdf</div>
+                                        <div class="document-date">08 juin 2026</div>
+                                    </div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-btn" onclick="shareDocument()">🔗</button>
+                                    <button class="document-btn" onclick="deleteDocument()">🗑️</button>
+                                </div>
+                            </div>
+                            <div class="document-item">
+                                <div class="document-info">
+                                    <span class="document-icon">📋</span>
+                                    <div class="document-details">
+                                        <div class="document-name">Plan d'action école.docx</div>
+                                        <div class="document-date">05 juin 2026</div>
+                                    </div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-btn" onclick="shareDocument()">🔗</button>
+                                    <button class="document-btn" onclick="deleteDocument()">🗑️</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="margin-bottom: 12px; color: #1F2937;">👥 Partager avec d'autres parents</h3>
+                        <div class="share-input">
+                            <input type="email" placeholder="Email du parent" id="parentEmail">
+                            <button class="share-btn" onclick="addSharedParent()">Ajouter</button>
+                        </div>
+                        
+                        <div class="shared-with">
+                            <div class="shared-person">
+                                <span class="person-name">papa@example.com</span>
+                                <button class="remove-access" onclick="removeAccess()">Retirer</button>
+                            </div>
+                            <div class="shared-person">
+                                <span class="person-name">maman@example.com</span>
+                                <button class="remove-access" onclick="removeAccess()">Retirer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: PARAMÈTRES -->
             <div class="tab-content" id="settings">
                 <div class="section">
                     <div class="section-title">⚙️ Paramètres</div>
-                    <div class="setting-item">
-                        <span class="setting-label">Profil</span>
-                        <span class="setting-value">Marie Gasper</span>
+                    
+                    <div class="card">
+                        <h3 style="margin-bottom: 16px; color: #1F2937;">👧 Profil de l'enfant</h3>
+                        <div class="setting-item">
+                            <span class="setting-label">Nom</span>
+                            <button class="edit-btn" onclick="openEditProfile()">Modifier</button>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Âge</span>
+                            <button class="edit-btn" onclick="openEditProfile()">Modifier</button>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Handicaps</span>
+                            <button class="edit-btn" onclick="openEditPathologies()">Modifier</button>
+                        </div>
                     </div>
-                    <div class="setting-item">
-                        <span class="setting-label">Notifications</span>
-                        <span class="setting-value">Activées</span>
+
+                    <div class="card">
+                        <h3 style="margin-bottom: 16px; color: #1F2937;">⚙️ Préférences</h3>
+                        <div class="setting-item">
+                            <span class="setting-label">Notifications</span>
+                            <span class="setting-value" onclick="toggleNotifications()">Activées</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Langue</span>
+                            <span class="setting-value" onclick="changeLanguage()">Français</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Thème</span>
+                            <span class="setting-value" onclick="changeTheme()">Clair</span>
+                        </div>
                     </div>
-                    <div class="setting-item">
-                        <span class="setting-label">Langue</span>
-                        <span class="setting-value">Français</span>
+
+                    <div class="card">
+                        <h3 style="margin-bottom: 16px; color: #1F2937;">ℹ️ À propos</h3>
+                        <div class="setting-item">
+                            <span class="setting-label">Version</span>
+                            <span class="setting-value">1.0.0</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Conditions</span>
+                            <span class="setting-value" onclick="showAlert('Conditions d\'utilisation')">Lire</span>
+                        </div>
                     </div>
-                    <div class="setting-item">
-                        <span class="setting-label">Thème</span>
-                        <span class="setting-value">Clair</span>
-                    </div>
-                    <div class="setting-item">
-                        <span class="setting-label">Version</span>
-                        <span class="setting-value">1.0.0</span>
-                    </div>
+
+                    <button class="edit-btn" style="width: calc(100% - 8px); background: #EF4444; margin-top: 16px;" onclick="logout()">
+                        🚪 Déconnexion
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- NAVIGATION -->
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('home')">🏠 Accueil</button>
-            <button class="nav-tab" onclick="switchTab('agenda')">📅 Agenda</button>
-            <button class="nav-tab" onclick="switchTab('routines')">⏰ Routines</button>
-            <button class="nav-tab" onclick="switchTab('resources')">📚 Ressources</button>
-            <button class="nav-tab" onclick="switchTab('settings')">⚙️ Paramètres</button>
+            <button class="nav-tab active" onclick="switchTab('home')">🏠</button>
+            <button class="nav-tab" onclick="switchTab('agenda')">📅</button>
+            <button class="nav-tab" onclick="switchTab('routines')">⏰</button>
+            <button class="nav-tab" onclick="switchTab('resources')">📚</button>
+            <button class="nav-tab" onclick="switchTab('documents')">📤</button>
+            <button class="nav-tab" onclick="switchTab('settings')">⚙️</button>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Modal: Editer Profil -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-title">✏️ Modifier le profil</div>
+            <form onsubmit="saveProfile(event)">
+                <div class="form-group">
+                    <label class="form-label">Nom de l'enfant</label>
+                    <input type="text" class="form-input" id="childNameInput" placeholder="Marie Gasper" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Âge</label>
+                    <input type="number" class="form-input" id="childAgeInput" placeholder="7" min="1" max="18" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editProfileModal')">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Editer Pathologies -->
+    <div class="modal" id="editPathologiesModal">
+        <div class="modal-content">
+            <div class="modal-title">🏥 Modifier les handicaps</div>
+            <form onsubmit="savePathologies(event)">
+                <div class="form-group">
+                    <label class="form-label">Ajouter un handicap</label>
+                    <div class="pathology-input">
+                        <input type="text" class="form-input" id="newPathology" placeholder="Ex: Dyspraxie, Autisme...">
+                        <button type="button" class="add-pathology-btn" onclick="addPathologyTag()">+</button>
+                    </div>
+                </div>
+                
+                <div id="pathologyTagsList">
+                    <div class="pathology-tag-edit">
+                        Dyslexie
+                        <button type="button" class="remove-btn" onclick="removePathologyTag(this)">✕</button>
+                    </div>
+                    <div class="pathology-tag-edit">
+                        TDAH
+                        <button type="button" class="remove-btn" onclick="removePathologyTag(this)">✕</button>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editPathologiesModal')">Annuler</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
+        // Data storage (localStorage)
+        let appData = {
+            childName: 'Marie Gasper',
+            childAge: 7,
+            pathologies: ['Dyslexie', 'TDAH'],
+            mood: null,
+            documents: [
+                { name: 'Rapport psychologue.pdf', date: '08 juin 2026' },
+                { name: 'Plan d\'action école.docx', date: '05 juin 2026' }
+            ],
+            sharedWith: ['papa@example.com', 'maman@example.com']
+        };
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('alaryc_data');
+            if (saved) {
+                appData = JSON.parse(saved);
+                updateDisplay();
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('alaryc_data', JSON.stringify(appData));
+        }
+
+        // Update display
+        function updateDisplay() {
+            document.getElementById('childNameDisplay').textContent = appData.childName;
+            document.getElementById('childAgeDisplay').textContent = appData.childAge + ' ans';
+            
+            const pathologiesHtml = appData.pathologies.map(p => 
+                `<span class="pathology-tag">${p}</span>`
+            ).join('');
+            document.getElementById('pathologiesDisplay').innerHTML = pathologiesHtml;
+        }
+
+        // Tab switching
         function switchTab(tabName) {
-            // Masquer tous les onglets
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => tab.classList.remove('active'));
-
-            // Masquer tous les boutons actifs
+            
             const navTabs = document.querySelectorAll('.nav-tab');
             navTabs.forEach(tab => tab.classList.remove('active'));
-
-            // Afficher l'onglet sélectionné
+            
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
         }
 
+        // Mood selection
         function setMood(mood) {
-            const moods = {
-                'happy': '😊',
-                'neutral': '😐',
-                'sad': '😢',
-                'angry': '😠'
-            };
-
-            // Supprimer la classe active de tous les boutons
+            appData.mood = mood;
+            saveData();
+            
             document.querySelectorAll('.mood-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-
-            // Ajouter la classe active au bouton cliqué
             event.target.closest('.mood-btn').classList.add('active');
+        }
 
-            console.log('Humeur sélectionnée:', mood);
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function openEditProfile() {
+            document.getElementById('childNameInput').value = appData.childName;
+            document.getElementById('childAgeInput').value = appData.childAge;
+            openModal('editProfileModal');
+        }
+
+        function saveProfile(event) {
+            event.preventDefault();
+            appData.childName = document.getElementById('childNameInput').value;
+            appData.childAge = parseInt(document.getElementById('childAgeInput').value);
+            saveData();
+            updateDisplay();
+            closeModal('editProfileModal');
+            showAlert('✅ Profil mis à jour!');
+        }
+
+        function openEditPathologies() {
+            openModal('editPathologiesModal');
+        }
+
+        function addPathologyTag() {
+            const input = document.getElementById('newPathology');
+            const value = input.value.trim();
+            
+            if (value && !appData.pathologies.includes(value)) {
+                appData.pathologies.push(value);
+                input.value = '';
+                updatePathologyList();
+            }
+        }
+
+        function removePathologyTag(button) {
+            const tagText = button.parentElement.textContent.replace('✕', '').trim();
+            appData.pathologies = appData.pathologies.filter(p => p !== tagText);
+            updatePathologyList();
+        }
+
+        function updatePathologyList() {
+            const list = document.getElementById('pathologyTagsList');
+            list.innerHTML = appData.pathologies.map(p => 
+                `<div class="pathology-tag-edit">
+                    ${p}
+                    <button type="button" class="remove-btn" onclick="removePathologyTag(this)">✕</button>
+                </div>`
+            ).join('');
+        }
+
+        function savePathologies(event) {
+            event.preventDefault();
+            saveData();
+            updateDisplay();
+            closeModal('editPathologiesModal');
+            showAlert('✅ Handicaps mis à jour!');
+        }
+
+        // Document functions
+        function addDocument(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const now = new Date();
+                const date = now.toLocaleDateString('fr-FR');
+                appData.documents.push({ name: file.name, date: date });
+                saveData();
+                showAlert('✅ Document ajouté!');
+            }
+        }
+
+        function shareDocument() {
+            showAlert('🔗 Lien de partage copié!');
+        }
+
+        function deleteDocument() {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce document?')) {
+                showAlert('✅ Document supprimé!');
+            }
+        }
+
+        function addSharedParent() {
+            const email = document.getElementById('parentEmail').value;
+            if (email && !appData.sharedWith.includes(email)) {
+                appData.sharedWith.push(email);
+                saveData();
+                document.getElementById('parentEmail').value = '';
+                showAlert('✅ Parent ajouté!');
+            }
+        }
+
+        function removeAccess() {
+            if (confirm('Retirer l\'accès à ce parent?')) {
+                showAlert('✅ Accès retiré!');
+            }
+        }
+
+        // Settings functions
+        function toggleNotifications() {
+            showAlert('🔔 Notifications modifiées!');
+        }
+
+        function changeLanguage() {
+            showAlert('🌐 Langue: Français');
+        }
+
+        function changeTheme() {
+            showAlert('🌙 Thème: Clair');
+        }
+
+        function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter?')) {
+                showAlert('👋 À bientôt!');
+            }
         }
 
         function showAlert(message) {
             alert(message);
         }
+
+        // Initialize
+        loadData();
+        updateDisplay();
     </script>
 </body>
 </html>
