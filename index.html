@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alaryc - Agenda pour enfants</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,7 +14,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #F8F9FA;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             color: #1F2937;
         }
 
@@ -22,19 +24,21 @@
             margin: 0 auto;
             background-color: #fff;
             min-height: 100vh;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
 
         .header {
-            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px 20px;
             text-align: center;
+            position: relative;
         }
 
         .header h1 {
             font-size: 36px;
             margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .header p {
@@ -42,8 +46,37 @@
             opacity: 0.9;
         }
 
+        .user-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 20px;
+        }
+
+        .user-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .user-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
         .content {
             padding: 20px;
+            padding-bottom: 100px;
         }
 
         .section {
@@ -55,21 +88,30 @@
             font-weight: 600;
             margin-bottom: 12px;
             color: #1F2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .card {
             background: white;
             border: 1px solid #E5E7EB;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 16px;
             margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
         }
 
-        .moods {
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .mood-section {
             display: flex;
             justify-content: space-around;
             gap: 8px;
+            margin-bottom: 16px;
         }
 
         .mood-btn {
@@ -89,8 +131,8 @@
 
         .mood-btn:hover,
         .mood-btn.active {
-            border-color: #6366F1;
-            background: #EEF2FF;
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
             transform: scale(1.05);
         }
 
@@ -100,34 +142,133 @@
             font-weight: 500;
         }
 
-        .routine-item,
-        .appointment-item {
+        /* Checklist Styles */
+        .checklist-item {
             display: flex;
             align-items: center;
             padding: 12px;
             background: #F9FAFB;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-bottom: 8px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #E5E7EB;
         }
 
-        .item-icon {
-            font-size: 24px;
+        .checklist-item.completed {
+            background: #ECFDF5;
+            border-left-color: #10B981;
+        }
+
+        .checklist-item.completed .item-text {
+            text-decoration: line-through;
+            color: #9CA3AF;
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #E5E7EB;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-right: 12px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
-        .item-content {
+        .checklist-item:hover .checklist-checkbox {
+            border-color: #667eea;
+        }
+
+        .checklist-item.completed .checklist-checkbox {
+            background: #10B981;
+            border-color: #10B981;
+        }
+
+        .checklist-checkbox::after {
+            content: '';
+            display: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .checklist-item.completed .checklist-checkbox::after {
+            display: inline;
+            content: '✓';
+        }
+
+        .item-text {
             flex: 1;
-        }
-
-        .item-title {
             font-weight: 500;
             color: #1F2937;
-            margin-bottom: 2px;
         }
 
         .item-time {
             font-size: 12px;
-            color: #6B7280;
+            color: #9CA3AF;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 8px;
+        }
+
+        .item-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .checklist-item:hover .item-btn {
+            opacity: 1;
+        }
+
+        /* Progress Chart */
+        .progress-container {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin: 16px 0;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
         }
 
         .nav-tabs {
@@ -135,15 +276,18 @@
             justify-content: space-around;
             border-top: 1px solid #E5E7EB;
             background: white;
-            position: sticky;
+            position: fixed;
             bottom: 0;
+            width: 100%;
+            max-width: 500px;
             padding: 8px 0;
+            z-index: 100;
             overflow-x: auto;
         }
 
         .nav-tab {
             flex: 1;
-            min-width: 80px;
+            min-width: 60px;
             padding: 12px 8px;
             text-align: center;
             cursor: pointer;
@@ -152,25 +296,42 @@
             font-size: 12px;
             color: #9CA3AF;
             transition: all 0.3s ease;
+            font-weight: 500;
             white-space: nowrap;
         }
 
         .nav-tab.active {
-            color: #6366F1;
-            font-weight: 600;
+            color: #667eea;
         }
 
         .tab-content {
             display: none;
-            padding-bottom: 60px;
         }
 
         .tab-content.active {
             display: block;
         }
 
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
         .child-info {
-            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 16px;
             border-radius: 12px;
@@ -181,11 +342,6 @@
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 4px;
-        }
-
-        .child-age {
-            font-size: 14px;
-            opacity: 0.9;
         }
 
         .pathologies {
@@ -203,96 +359,6 @@
             font-weight: 500;
         }
 
-        .action-card {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            background: white;
-            border-left: 4px solid #6366F1;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-card:hover {
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-        }
-
-        .action-icon {
-            font-size: 28px;
-            margin-right: 12px;
-        }
-
-        .action-text {
-            font-weight: 500;
-            color: #1F2937;
-        }
-
-        .resource-card {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            background: white;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            border: 1px solid #E5E7EB;
-        }
-
-        .resource-emoji {
-            font-size: 32px;
-            margin-right: 12px;
-        }
-
-        .resource-title {
-            font-weight: 500;
-            color: #1F2937;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid #E5E7EB;
-        }
-
-        .setting-label {
-            font-weight: 500;
-            color: #1F2937;
-        }
-
-        .setting-value {
-            font-size: 14px;
-            color: #6B7280;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .setting-value:hover {
-            background: #EEF2FF;
-            color: #6366F1;
-        }
-
-        .edit-btn {
-            background: #6366F1;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            margin-left: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .edit-btn:hover {
-            background: #4F46E5;
-        }
-
-        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -323,6 +389,8 @@
             width: 100%;
             max-width: 500px;
             animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         @keyframes slideUp {
@@ -359,8 +427,8 @@
 
         .form-input:focus {
             outline: none;
-            border-color: #6366F1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .button-group {
@@ -380,12 +448,13 @@
         }
 
         .btn-primary {
-            background: #6366F1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
         .btn-primary:hover {
-            background: #4F46E5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
         .btn-secondary {
@@ -397,94 +466,28 @@
             background: #D1D5DB;
         }
 
-        .document-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            background: #F9FAFB;
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .document-info {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-
-        .document-icon {
-            font-size: 24px;
-            margin-right: 12px;
-        }
-
-        .document-details {
-            flex: 1;
-        }
-
-        .document-name {
-            font-weight: 500;
-            color: #1F2937;
-            margin-bottom: 2px;
-        }
-
-        .document-date {
-            font-size: 12px;
-            color: #6B7280;
-        }
-
-        .document-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .document-btn {
-            background: none;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .document-btn:hover {
-            transform: scale(1.2);
-        }
-
-        .upload-zone {
-            border: 2px dashed #6366F1;
-            border-radius: 12px;
-            padding: 24px;
+        .empty-state {
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 16px;
+            padding: 40px 20px;
+            color: #9CA3AF;
         }
 
-        .upload-zone:hover {
-            background: #EEF2FF;
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
         }
 
-        .upload-icon {
-            font-size: 36px;
-            margin-bottom: 8px;
-        }
-
-        .upload-text {
-            font-size: 14px;
-            color: #6B7280;
-        }
-
-        .pathology-input {
+        .objective-input-group {
             display: flex;
             gap: 8px;
             margin-bottom: 12px;
         }
 
-        .pathology-input input {
+        .objective-input-group input {
             flex: 1;
         }
 
-        .add-pathology-btn {
+        .objective-btn {
             background: #10B981;
             color: white;
             border: none;
@@ -494,86 +497,102 @@
             font-weight: 500;
         }
 
-        .add-pathology-btn:hover {
+        .objective-btn:hover {
             background: #059669;
         }
 
-        .pathology-tag-edit {
+        .objective-item {
             display: flex;
             align-items: center;
-            gap: 6px;
-            background: #DBEAFE;
-            color: #1E40AF;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            margin-bottom: 8px;
-            width: fit-content;
-        }
-
-        .remove-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            color: #1E40AF;
-        }
-
-        .share-input {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .share-input input {
-            flex: 1;
-        }
-
-        .share-btn {
-            background: #6366F1;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .share-btn:hover {
-            background: #4F46E5;
-        }
-
-        .shared-with {
-            background: #F9FAFB;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        .shared-person {
-            display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #E5E7EB;
+            padding: 12px;
+            background: #F9FAFB;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid #667eea;
         }
 
-        .shared-person:last-child {
-            border-bottom: none;
-        }
-
-        .person-name {
+        .objective-text {
+            flex: 1;
             font-weight: 500;
             color: #1F2937;
         }
 
-        .remove-access {
-            background: none;
-            border: none;
-            color: #EF4444;
-            cursor: pointer;
-            font-weight: 500;
+        .objective-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            width: 60px;
+            height: 6px;
+            background: #E5E7EB;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-percent {
             font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            min-width: 30px;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: #F9FAFB;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .resource-item:hover {
+            background: #EEF2FF;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+
+        .resource-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .resource-content {
+            flex: 1;
+        }
+
+        .resource-title {
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 4px;
+        }
+
+        .resource-desc {
+            font-size: 13px;
+            color: #6B7280;
+            line-height: 1.4;
+        }
+
+        .resource-tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-top: 8px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -583,15 +602,19 @@
         <div class="header">
             <h1>🌟 Alaryc</h1>
             <p>Agenda pour enfants</p>
+            <div class="user-toggle">
+                <button class="user-btn active" onclick="switchUser('child')">👧 Enfant</button>
+                <button class="user-btn" onclick="switchUser('parent')">👨‍👩‍👧 Parent</button>
+            </div>
         </div>
 
         <!-- CONTENU -->
         <div class="content">
             <!-- TAB 1: ACCUEIL -->
             <div class="tab-content active" id="home">
-                <div class="section">
+                <div class="section" id="moodSection">
                     <div class="section-title">📊 Humeur du jour</div>
-                    <div class="moods">
+                    <div class="mood-section">
                         <button class="mood-btn" onclick="setMood('happy')">
                             😊
                             <span class="mood-label">Heureux</span>
@@ -612,22 +635,6 @@
                 </div>
 
                 <div class="section">
-                    <div class="section-title">⚡ Actions rapides</div>
-                    <div class="action-card" onclick="showAlert('Rendez-vous d\'aujourd\'hui')">
-                        <span class="action-icon">📅</span>
-                        <span class="action-text">Rendez-vous d'aujourd'hui</span>
-                    </div>
-                    <div class="action-card" onclick="showAlert('Routines du jour')">
-                        <span class="action-icon">⏰</span>
-                        <span class="action-text">Routines du jour</span>
-                    </div>
-                    <div class="action-card" onclick="showAlert('Suivi des progrès')">
-                        <span class="action-icon">✅</span>
-                        <span class="action-text">Suivi des progrès</span>
-                    </div>
-                </div>
-
-                <div class="section">
                     <div class="section-title">👧 Profil de l'enfant</div>
                     <div class="child-info">
                         <div class="child-name" id="childNameDisplay">Marie Gasper</div>
@@ -638,74 +645,54 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- TAB 2: AGENDA -->
-            <div class="tab-content" id="agenda">
-                <div class="section">
-                    <div class="section-title">📅 Rendez-vous</div>
-                    <div class="appointment-item">
-                        <span class="item-icon">🏥</span>
-                        <div class="item-content">
-                            <div class="item-title">Rendez-vous psychologue</div>
-                            <div class="item-time">Clinique ABC - 10:00</div>
-                        </div>
-                    </div>
-                    <div class="appointment-item">
-                        <span class="item-icon">🧠</span>
-                        <div class="item-content">
-                            <div class="item-title">Séance d'orthophonie</div>
-                            <div class="item-time">Centre de rééducation - 14:30</div>
-                        </div>
-                    </div>
-                    <div class="appointment-item">
-                        <span class="item-icon">👨‍⚕️</span>
-                        <div class="item-content">
-                            <div class="item-title">Contrôle médical</div>
-                            <div class="item-time">Cabinet médical - 15:00</div>
-                        </div>
-                    </div>
+                <div class="section" id="parentSection" style="display: none;">
+                    <button class="add-btn" onclick="openModal('editProfileModal')">✏️ Modifier le profil</button>
+                    <button class="add-btn" onclick="openModal('editPathologiesModal')">🏥 Modifier les handicaps</button>
                 </div>
             </div>
 
-            <!-- TAB 3: ROUTINES -->
-            <div class="tab-content" id="routines">
+            <!-- TAB 2: CHECKLIST -->
+            <div class="tab-content" id="checklist">
                 <div class="section">
-                    <div class="section-title">⏰ Routines</div>
-                    <div class="routine-item">
-                        <span class="item-icon">🥣</span>
-                        <div class="item-content">
-                            <div class="item-title">Petit-déjeuner</div>
-                            <div class="item-time">08:00</div>
+                    <div class="section-title">⏰ Routines d'aujourd'hui</div>
+                    <div id="checklistRoutines"></div>
+                    <button class="add-btn" id="addRoutineBtn" onclick="openModal('addRoutineModal')" style="display: none;">+ Ajouter une routine</button>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">✅ Tâches de l'enfant</div>
+                    <div id="checklistTasks"></div>
+                    <button class="add-btn" id="addTaskBtn" onclick="openModal('addTaskModal')" style="display: none;">+ Ajouter une tâche</button>
+                </div>
+            </div>
+
+            <!-- TAB 3: PROGRÈS -->
+            <div class="tab-content" id="progress">
+                <div class="section">
+                    <div class="section-title">📈 Suivi des progrès</div>
+                    
+                    <div class="progress-container">
+                        <h3 style="margin-bottom: 12px; color: #1F2937;">Cette semaine</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="stat-box">
+                                <div class="stat-value" id="statCompletion">75%</div>
+                                <div class="stat-label">Tâches complétées</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="statStreak">5</div>
+                                <div class="stat-label">Jours consécutifs</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="routine-item">
-                        <span class="item-icon">🎒</span>
-                        <div class="item-content">
-                            <div class="item-title">Préparation école</div>
-                            <div class="item-time">08:30</div>
-                        </div>
-                    </div>
-                    <div class="routine-item">
-                        <span class="item-icon">🏠</span>
-                        <div class="item-content">
-                            <div class="item-title">Retour école</div>
-                            <div class="item-time">16:30</div>
-                        </div>
-                    </div>
-                    <div class="routine-item">
-                        <span class="item-icon">🍎</span>
-                        <div class="item-content">
-                            <div class="item-title">Goûter</div>
-                            <div class="item-time">17:00</div>
-                        </div>
-                    </div>
-                    <div class="routine-item">
-                        <span class="item-icon">🛏️</span>
-                        <div class="item-content">
-                            <div class="item-title">Coucher</div>
-                            <div class="item-time">20:30</div>
-                        </div>
+
+                    <div class="section">
+                        <div class="section-title">🎯 Objectifs</div>
+                        <div id="objectivesList"></div>
+                        <button class="add-btn" id="addObjectiveBtn" onclick="openModal('addObjectiveModal')" style="display: none;">+ Ajouter un objectif</button>
                     </div>
                 </div>
             </div>
@@ -714,89 +701,78 @@
             <div class="tab-content" id="resources">
                 <div class="section">
                     <div class="section-title">📚 Ressources</div>
-                    <div class="resource-card">
-                        <span class="resource-emoji">📖</span>
-                        <span class="resource-title">Comprendre le TDAH</span>
+                    
+                    <div class="resource-item" onclick="openResource('tdah')">
+                        <div class="resource-icon">🧠</div>
+                        <div class="resource-content">
+                            <div class="resource-title">Comprendre le TDAH</div>
+                            <div class="resource-desc">Conseils et stratégies pour aider votre enfant à mieux gérer son attention et son impulsivité.</div>
+                            <span class="resource-tag">📖 Article</span>
+                        </div>
                     </div>
-                    <div class="resource-card">
-                        <span class="resource-emoji">🧘</span>
-                        <span class="resource-title">Techniques de relaxation</span>
+
+                    <div class="resource-item" onclick="openResource('dyslexie')">
+                        <div class="resource-icon">📖</div>
+                        <div class="resource-content">
+                            <div class="resource-title">Soutien pour la dyslexie</div>
+                            <div class="resource-desc">Techniques de lecture adaptées et outils pour accompagner un enfant dyslexique.</div>
+                            <span class="resource-tag">📖 Article</span>
+                        </div>
                     </div>
-                    <div class="resource-card">
-                        <span class="resource-emoji">🎨</span>
-                        <span class="resource-title">Activités créatives</span>
+
+                    <div class="resource-item" onclick="openResource('relaxation')">
+                        <div class="resource-icon">🧘</div>
+                        <div class="resource-content">
+                            <div class="resource-title">Techniques de relaxation</div>
+                            <div class="resource-desc">Exercices de respiration et de méditation adaptés aux enfants.</div>
+                            <span class="resource-tag">🎥 Vidéo</span>
+                        </div>
                     </div>
-                    <div class="resource-card">
-                        <span class="resource-emoji">🎮</span>
-                        <span class="resource-title">Jeux éducatifs</span>
+
+                    <div class="resource-item" onclick="openResource('activites')">
+                        <div class="resource-icon">🎨</div>
+                        <div class="resource-content">
+                            <div class="resource-title">Activités créatives</div>
+                            <div class="resource-desc">Idées d'activités pour favoriser la créativité et l'expression.</div>
+                            <span class="resource-tag">🎨 Activité</span>
+                        </div>
                     </div>
-                    <div class="resource-card">
-                        <span class="resource-emoji">📱</span>
-                        <span class="resource-title">Apps recommandées</span>
+
+                    <div class="resource-item" onclick="openResource('jeux')">
+                        <div class="resource-icon">🎮</div>
+                        <div class="resource-content">
+                            <div class="resource-title">Jeux éducatifs</div>
+                            <div class="resource-desc">Applications et jeux recommandés pour apprendre en s'amusant.</div>
+                            <span class="resource-tag">🎮 App</span>
+                        </div>
+                    </div>
+
+                    <div class="resource-item" onclick="openResource('sommeil')">
+                        <div class="resource-icon">😴</div>
+                        <div class="resource-content">
+                            <div class="resource-title">Hygiène du sommeil</div>
+                            <div class="resource-desc">Conseils pour aider votre enfant à avoir un sommeil de qualité.</div>
+                            <span class="resource-tag">📖 Article</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 5: PARTAGE DE DOCUMENT -->
-            <div class="tab-content" id="documents">
+            <!-- TAB 5: AGENDA -->
+            <div class="tab-content" id="agenda">
                 <div class="section">
-                    <div class="section-title">📤 Partage de document</div>
-                    
+                    <div class="section-title">📅 Rendez-vous</div>
                     <div class="card">
-                        <h3 style="margin-bottom: 12px; color: #1F2937;">📤 Uploader un document</h3>
-                        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-                            <div class="upload-icon">📁</div>
-                            <div class="upload-text">Cliquez pour uploader un document</div>
-                        </div>
-                        <input type="file" id="fileInput" style="display: none;" onchange="addDocument(event)">
-                        
-                        <div id="documentList">
-                            <div class="document-item">
-                                <div class="document-info">
-                                    <span class="document-icon">📄</span>
-                                    <div class="document-details">
-                                        <div class="document-name">Rapport psychologue.pdf</div>
-                                        <div class="document-date">08 juin 2026</div>
-                                    </div>
-                                </div>
-                                <div class="document-actions">
-                                    <button class="document-btn" onclick="shareDocument()">🔗</button>
-                                    <button class="document-btn" onclick="deleteDocument()">🗑️</button>
-                                </div>
-                            </div>
-                            <div class="document-item">
-                                <div class="document-info">
-                                    <span class="document-icon">📋</span>
-                                    <div class="document-details">
-                                        <div class="document-name">Plan d'action école.docx</div>
-                                        <div class="document-date">05 juin 2026</div>
-                                    </div>
-                                </div>
-                                <div class="document-actions">
-                                    <button class="document-btn" onclick="shareDocument()">🔗</button>
-                                    <button class="document-btn" onclick="deleteDocument()">🗑️</button>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="item-text">🏥 Psychologue</div>
+                        <div class="item-time">Clinique ABC - 10:00</div>
                     </div>
-
                     <div class="card">
-                        <h3 style="margin-bottom: 12px; color: #1F2937;">👥 Partager avec d'autres parents</h3>
-                        <div class="share-input">
-                            <input type="email" placeholder="Email du parent" id="parentEmail">
-                            <button class="share-btn" onclick="addSharedParent()">Ajouter</button>
-                        </div>
-                        
-                        <div class="shared-with">
-                            <div class="shared-person">
-                                <span class="person-name">papa@example.com</span>
-                                <button class="remove-access" onclick="removeAccess()">Retirer</button>
-                            </div>
-                            <div class="shared-person">
-                                <span class="person-name">maman@example.com</span>
-                                <button class="remove-access" onclick="removeAccess()">Retirer</button>
-                            </div>
-                        </div>
+                        <div class="item-text">🧠 Orthophonie</div>
+                        <div class="item-time">Centre de rééducation - 14:30</div>
+                    </div>
+                    <div class="card">
+                        <div class="item-text">👨‍⚕️ Contrôle médical</div>
+                        <div class="item-time">Cabinet médical - 15:00</div>
                     </div>
                 </div>
             </div>
@@ -805,54 +781,13 @@
             <div class="tab-content" id="settings">
                 <div class="section">
                     <div class="section-title">⚙️ Paramètres</div>
-                    
                     <div class="card">
-                        <h3 style="margin-bottom: 16px; color: #1F2937;">👧 Profil de l'enfant</h3>
-                        <div class="setting-item">
-                            <span class="setting-label">Nom</span>
-                            <button class="edit-btn" onclick="openEditProfile()">Modifier</button>
-                        </div>
-                        <div class="setting-item">
-                            <span class="setting-label">Âge</span>
-                            <button class="edit-btn" onclick="openEditProfile()">Modifier</button>
-                        </div>
-                        <div class="setting-item">
-                            <span class="setting-label">Handicaps</span>
-                            <button class="edit-btn" onclick="openEditPathologies()">Modifier</button>
+                        <div style="text-align: center; padding: 20px;">
+                            <div style="font-size: 48px; margin-bottom: 12px;">⚙️</div>
+                            <p style="color: #6B7280; margin-bottom: 12px;">Version 2.0</p>
+                            <button class="add-btn" onclick="logout()">🚪 Déconnexion</button>
                         </div>
                     </div>
-
-                    <div class="card">
-                        <h3 style="margin-bottom: 16px; color: #1F2937;">⚙️ Préférences</h3>
-                        <div class="setting-item">
-                            <span class="setting-label">Notifications</span>
-                            <span class="setting-value" onclick="toggleNotifications()">Activées</span>
-                        </div>
-                        <div class="setting-item">
-                            <span class="setting-label">Langue</span>
-                            <span class="setting-value" onclick="changeLanguage()">Français</span>
-                        </div>
-                        <div class="setting-item">
-                            <span class="setting-label">Thème</span>
-                            <span class="setting-value" onclick="changeTheme()">Clair</span>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3 style="margin-bottom: 16px; color: #1F2937;">ℹ️ À propos</h3>
-                        <div class="setting-item">
-                            <span class="setting-label">Version</span>
-                            <span class="setting-value">1.0.0</span>
-                        </div>
-                        <div class="setting-item">
-                            <span class="setting-label">Conditions</span>
-                            <span class="setting-value" onclick="showAlert('Conditions d\'utilisation')">Lire</span>
-                        </div>
-                    </div>
-
-                    <button class="edit-btn" style="width: calc(100% - 8px); background: #EF4444; margin-top: 16px;" onclick="logout()">
-                        🚪 Déconnexion
-                    </button>
                 </div>
             </div>
         </div>
@@ -860,27 +795,86 @@
         <!-- NAVIGATION -->
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="switchTab('home')">🏠</button>
-            <button class="nav-tab" onclick="switchTab('agenda')">📅</button>
-            <button class="nav-tab" onclick="switchTab('routines')">⏰</button>
+            <button class="nav-tab" onclick="switchTab('checklist')">✅</button>
+            <button class="nav-tab" onclick="switchTab('progress')">📈</button>
             <button class="nav-tab" onclick="switchTab('resources')">📚</button>
-            <button class="nav-tab" onclick="switchTab('documents')">📤</button>
+            <button class="nav-tab" onclick="switchTab('agenda')">📅</button>
             <button class="nav-tab" onclick="switchTab('settings')">⚙️</button>
         </div>
     </div>
 
     <!-- MODALS -->
-    <!-- Modal: Editer Profil -->
+    <!-- Add Routine Modal -->
+    <div class="modal" id="addRoutineModal">
+        <div class="modal-content">
+            <div class="modal-title">➕ Ajouter une routine</div>
+            <form onsubmit="addRoutine(event)">
+                <div class="form-group">
+                    <label class="form-label">Nom de la routine</label>
+                    <input type="text" class="form-input" placeholder="Ex: Petit-déjeuner" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Heure</label>
+                    <input type="time" class="form-input" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addRoutineModal')">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal" id="addTaskModal">
+        <div class="modal-content">
+            <div class="modal-title">➕ Ajouter une tâche</div>
+            <form onsubmit="addTask(event)">
+                <div class="form-group">
+                    <label class="form-label">Nom de la tâche</label>
+                    <input type="text" class="form-input" placeholder="Ex: Faire les devoirs" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addTaskModal')">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Objective Modal -->
+    <div class="modal" id="addObjectiveModal">
+        <div class="modal-content">
+            <div class="modal-title">🎯 Ajouter un objectif</div>
+            <form onsubmit="addObjective(event)">
+                <div class="form-group">
+                    <label class="form-label">Objectif</label>
+                    <input type="text" class="form-input" placeholder="Ex: Compléter 100% des routines" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cible (%)</label>
+                    <input type="number" class="form-input" min="0" max="100" value="80" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addObjectiveModal')">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
     <div class="modal" id="editProfileModal">
         <div class="modal-content">
             <div class="modal-title">✏️ Modifier le profil</div>
             <form onsubmit="saveProfile(event)">
                 <div class="form-group">
                     <label class="form-label">Nom de l'enfant</label>
-                    <input type="text" class="form-input" id="childNameInput" placeholder="Marie Gasper" required>
+                    <input type="text" class="form-input" id="childNameInput" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Âge</label>
-                    <input type="number" class="form-input" id="childAgeInput" placeholder="7" min="1" max="18" required>
+                    <input type="number" class="form-input" id="childAgeInput" min="1" max="18" required>
                 </div>
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -890,29 +884,20 @@
         </div>
     </div>
 
-    <!-- Modal: Editer Pathologies -->
+    <!-- Edit Pathologies Modal -->
     <div class="modal" id="editPathologiesModal">
         <div class="modal-content">
             <div class="modal-title">🏥 Modifier les handicaps</div>
             <form onsubmit="savePathologies(event)">
                 <div class="form-group">
                     <label class="form-label">Ajouter un handicap</label>
-                    <div class="pathology-input">
-                        <input type="text" class="form-input" id="newPathology" placeholder="Ex: Dyspraxie, Autisme...">
-                        <button type="button" class="add-pathology-btn" onclick="addPathologyTag()">+</button>
+                    <div class="objective-input-group">
+                        <input type="text" class="form-input" id="newPathologyInput" placeholder="Ex: Dyspraxie">
+                        <button type="button" class="objective-btn" onclick="addPathologyTag()">+</button>
                     </div>
                 </div>
                 
-                <div id="pathologyTagsList">
-                    <div class="pathology-tag-edit">
-                        Dyslexie
-                        <button type="button" class="remove-btn" onclick="removePathologyTag(this)">✕</button>
-                    </div>
-                    <div class="pathology-tag-edit">
-                        TDAH
-                        <button type="button" class="remove-btn" onclick="removePathologyTag(this)">✕</button>
-                    </div>
-                </div>
+                <div id="pathologyTagsList"></div>
 
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -922,32 +907,168 @@
         </div>
     </div>
 
+    <!-- Resource Modal -->
+    <div class="modal" id="resourceModal">
+        <div class="modal-content">
+            <div class="modal-title" id="resourceTitle">Ressource</div>
+            <div id="resourceContent" style="color: #6B7280; line-height: 1.6;"></div>
+            <button class="add-btn" onclick="closeModal('resourceModal')" style="margin-top: 16px;">Fermer</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Data storage (localStorage)
+        let currentUser = 'child';
+        let progressChart = null;
+
+        const resources = {
+            tdah: {
+                title: '🧠 Comprendre le TDAH',
+                content: `<h3 style="margin-bottom: 12px;">TDAH - Points clés</h3>
+                <p><strong>Qu'est-ce que le TDAH?</strong></p>
+                <p>Le Trouble du Déficit de l'Attention avec ou sans Hyperactivité est une condition neurologique qui affecte l'attention, l'impulsivité et l'hyperactivité.</p>
+                <p style="margin-top: 12px;"><strong>Conseils pratiques:</strong></p>
+                <ul style="margin-left: 16px;">
+                <li>Créer une routine structurée</li>
+                <li>Utiliser des rappels visuels</li>
+                <li>Encourager des pauses régulières</li>
+                <li>Utiliser des récompenses immédiates</li>
+                <li>Adapter l'environnement (bruit, lumière)</li>
+                </ul>`
+            },
+            dyslexie: {
+                title: '📖 Soutien pour la dyslexie',
+                content: `<h3 style="margin-bottom: 12px;">Dyslexie - Aider votre enfant</h3>
+                <p><strong>Qu'est-ce que la dyslexie?</strong></p>
+                <p>La dyslexie est une difficulté spécifique à l'apprentissage de la lecture et de l'écriture.</p>
+                <p style="margin-top: 12px;"><strong>Stratégies d'accompagnement:</strong></p>
+                <ul style="margin-left: 16px;">
+                <li>Utiliser des polices adaptées (Arial, OpenDyslexic)</li>
+                <li>Préférer les images et les schémas</li>
+                <li>Lire à haute voix régulièrement</li>
+                <li>Pratiquer la phonétique</li>
+                <li>Utiliser des outils d'aide (audiobooks)</li>
+                </ul>`
+            },
+            relaxation: {
+                title: '🧘 Techniques de relaxation',
+                content: `<h3 style="margin-bottom: 12px;">Exercices simples pour enfants</h3>
+                <p><strong>Exercice de respiration (2 min):</strong></p>
+                <p>1. Inspirer lentement par le nez (4 secondes)<br>
+                2. Retenir (4 secondes)<br>
+                3. Expirer par la bouche (4 secondes)</p>
+                <p style="margin-top: 12px;"><strong>Relaxation musculaire:</strong></p>
+                <p>Tendre puis relâcher chaque groupe musculaire progressivement.</p>
+                <p style="margin-top: 12px;"><strong>Visualisation:</strong></p>
+                <p>Imaginer un endroit calme et sûr.</p>`
+            },
+            activites: {
+                title: '🎨 Activités créatives',
+                content: `<h3 style="margin-bottom: 12px;">Idées d'activités</h3>
+                <ul style="margin-left: 16px;">
+                <li><strong>Dessin et peinture:</strong> Exprimer ses émotions</li>
+                <li><strong>Moulage:</strong> Travailler la motricité fine</li>
+                <li><strong>Collage:</strong> Créer des mosaïques</li>
+                <li><strong>Musique:</strong> Jouer d'un instrument simple</li>
+                <li><strong>Théâtre:</strong> Jouer des petites scènes</li>
+                <li><strong>Écriture créative:</strong> Inventer des histoires</li>
+                </ul>`
+            },
+            jeux: {
+                title: '🎮 Jeux éducatifs recommandés',
+                content: `<h3 style="margin-bottom: 12px;">Applications recommandées</h3>
+                <ul style="margin-left: 16px;">
+                <li><strong>Duolingo:</strong> Apprentissage des langues</li>
+                <li><strong>Khan Academy Kids:</strong> Mathématiques et sciences</li>
+                <li><strong>Lumosity:</strong> Jeux pour le cerveau</li>
+                <li><strong>Minecraft Education:</strong> Créativité et apprentissage</li>
+                <li><strong>Codecombat:</strong> Initiation à la programmation</li>
+                <li><strong>Toca Boca:</strong> Jeux créatifs pour jeunes enfants</li>
+                </ul>`
+            },
+            sommeil: {
+                title: '😴 Hygiène du sommeil',
+                content: `<h3 style="margin-bottom: 12px;">Conseils pour un bon sommeil</h3>
+                <p><strong>Routine du soir:</strong></p>
+                <ul style="margin-left: 16px;">
+                <li>Heure de coucher régulière (même le weekend)</li>
+                <li>Éviter les écrans 1h avant le sommeil</li>
+                <li>Température fraîche de la chambre</li>
+                <li>Lecture ou histoire calme</li>
+                <li>Musique relaxante douce</li>
+                </ul>
+                <p style="margin-top: 12px;"><strong>À éviter:</strong></p>
+                <ul style="margin-left: 16px;">
+                <li>Café/thé sucré l'après-midi</li>
+                <li>Jeux vidéo avant le coucher</li>
+                <li>Lumière vive</li>
+                </ul>`
+            }
+        };
+
+        // Data storage
         let appData = {
             childName: 'Marie Gasper',
             childAge: 7,
             pathologies: ['Dyslexie', 'TDAH'],
             mood: null,
-            documents: [
-                { name: 'Rapport psychologue.pdf', date: '08 juin 2026' },
-                { name: 'Plan d\'action école.docx', date: '05 juin 2026' }
+            routines: [
+                { name: '🥣 Petit-déjeuner', time: '08:00', completed: false },
+                { name: '🎒 Préparation école', time: '08:30', completed: false },
+                { name: '🍎 Goûter', time: '17:00', completed: false },
+                { name: '🛏️ Coucher', time: '20:30', completed: false }
             ],
-            sharedWith: ['papa@example.com', 'maman@example.com']
+            tasks: [
+                { name: 'Faire les devoirs', completed: false },
+                { name: 'Ranger sa chambre', completed: false },
+                { name: 'Lire 30 minutes', completed: false }
+            ],
+            objectives: [
+                { name: 'Compléter les routines', target: 90, current: 75 },
+                { name: 'Finir les tâches', target: 85, current: 60 },
+                { name: 'Respecter les horaires', target: 95, current: 80 }
+            ]
         };
 
-        // Load data from localStorage
+        // Load data
         function loadData() {
             const saved = localStorage.getItem('alaryc_data');
             if (saved) {
                 appData = JSON.parse(saved);
-                updateDisplay();
             }
+            updateDisplay();
         }
 
-        // Save data to localStorage
+        // Save data
         function saveData() {
             localStorage.setItem('alaryc_data', JSON.stringify(appData));
+        }
+
+        // Switch user
+        function switchUser(user) {
+            currentUser = user;
+            document.querySelectorAll('.user-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const parentSection = document.getElementById('parentSection');
+            const moodSection = document.getElementById('moodSection');
+            const addRoutineBtn = document.getElementById('addRoutineBtn');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const addObjectiveBtn = document.getElementById('addObjectiveBtn');
+            
+            if (user === 'parent') {
+                parentSection.style.display = 'block';
+                moodSection.style.display = 'none';
+                addRoutineBtn.style.display = 'block';
+                addTaskBtn.style.display = 'block';
+                addObjectiveBtn.style.display = 'block';
+            } else {
+                parentSection.style.display = 'none';
+                moodSection.style.display = 'block';
+                addRoutineBtn.style.display = 'none';
+                addTaskBtn.style.display = 'none';
+                addObjectiveBtn.style.display = 'none';
+            }
         }
 
         // Update display
@@ -959,6 +1080,252 @@
                 `<span class="pathology-tag">${p}</span>`
             ).join('');
             document.getElementById('pathologiesDisplay').innerHTML = pathologiesHtml;
+            
+            updateChecklist();
+            updateObjectives();
+            updateChart();
+        }
+
+        // Update checklist
+        function updateChecklist() {
+            const routinesHtml = appData.routines.map((r, idx) => `
+                <div class="checklist-item ${r.completed ? 'completed' : ''}">
+                    <div class="checklist-checkbox" onclick="toggleRoutine(${idx})"></div>
+                    <div class="item-text">${r.name}</div>
+                    <div class="item-time">${r.time}</div>
+                    <div class="item-actions" ${currentUser !== 'parent' ? 'style="display: none;"' : ''}>
+                        <button class="item-btn" onclick="deleteRoutine(${idx})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('checklistRoutines').innerHTML = routinesHtml || '<div class="empty-state"><div class="empty-icon">🎯</div><p>Aucune routine</p></div>';
+
+            const tasksHtml = appData.tasks.map((t, idx) => `
+                <div class="checklist-item ${t.completed ? 'completed' : ''}">
+                    <div class="checklist-checkbox" onclick="toggleTask(${idx})"></div>
+                    <div class="item-text">${t.name}</div>
+                    <div class="item-actions" ${currentUser !== 'parent' ? 'style="display: none;"' : ''}>
+                        <button class="item-btn" onclick="deleteTask(${idx})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('checklistTasks').innerHTML = tasksHtml || '<div class="empty-state"><div class="empty-icon">✅</div><p>Aucune tâche</p></div>';
+        }
+
+        // Toggle routine
+        function toggleRoutine(idx) {
+            appData.routines[idx].completed = !appData.routines[idx].completed;
+            saveData();
+            updateChecklist();
+            updateChart();
+        }
+
+        // Toggle task
+        function toggleTask(idx) {
+            appData.tasks[idx].completed = !appData.tasks[idx].completed;
+            saveData();
+            updateChecklist();
+            updateChart();
+        }
+
+        // Add routine
+        function addRoutine(event) {
+            event.preventDefault();
+            const form = event.target;
+            const name = form.querySelector('input[type="text"]').value;
+            const time = form.querySelector('input[type="time"]').value;
+            appData.routines.push({ name, time, completed: false });
+            saveData();
+            updateDisplay();
+            closeModal('addRoutineModal');
+        }
+
+        // Add task
+        function addTask(event) {
+            event.preventDefault();
+            const form = event.target;
+            const name = form.querySelector('input[type="text"]').value;
+            appData.tasks.push({ name, completed: false });
+            saveData();
+            updateDisplay();
+            closeModal('addTaskModal');
+        }
+
+        // Delete routine
+        function deleteRoutine(idx) {
+            if (confirm('Supprimer cette routine?')) {
+                appData.routines.splice(idx, 1);
+                saveData();
+                updateChecklist();
+            }
+        }
+
+        // Delete task
+        function deleteTask(idx) {
+            if (confirm('Supprimer cette tâche?')) {
+                appData.tasks.splice(idx, 1);
+                saveData();
+                updateChecklist();
+            }
+        }
+
+        // Update objectives
+        function updateObjectives() {
+            const objectivesHtml = appData.objectives.map((obj, idx) => `
+                <div class="objective-item">
+                    <div class="objective-text">${obj.name}</div>
+                    <div class="objective-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${obj.current}%"></div>
+                        </div>
+                        <div class="progress-percent">${obj.current}%</div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('objectivesList').innerHTML = objectivesHtml || '<div class="empty-state"><p>Aucun objectif</p></div>';
+        }
+
+        // Add objective
+        function addObjective(event) {
+            event.preventDefault();
+            const form = event.target;
+            const name = form.querySelector('input[type="text"]').value;
+            const target = parseInt(form.querySelector('input[type="number"]').value);
+            appData.objectives.push({ name, target, current: 0 });
+            saveData();
+            updateObjectives();
+            closeModal('addObjectiveModal');
+        }
+
+        // Update chart
+        function updateChart() {
+            const ctx = document.getElementById('progressChart');
+            if (!ctx) return;
+
+            const completedRoutines = appData.routines.filter(r => r.completed).length;
+            const completedTasks = appData.tasks.filter(t => t.completed).length;
+            const totalItems = appData.routines.length + appData.tasks.length;
+            const completionPercent = totalItems > 0 ? Math.round((completedRoutines + completedTasks) / totalItems * 100) : 0;
+
+            document.getElementById('statCompletion').textContent = completionPercent + '%';
+
+            if (progressChart) {
+                progressChart.destroy();
+            }
+
+            progressChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                    datasets: [{
+                        label: 'Tâches complétées (%)',
+                        data: [65, 70, 75, 80, 85, 90, completionPercent],
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.5)',
+                            'rgba(102, 126, 234, 0.5)',
+                            'rgba(102, 126, 234, 0.5)',
+                            'rgba(102, 126, 234, 0.5)',
+                            'rgba(102, 126, 234, 0.5)',
+                            'rgba(102, 126, 234, 0.5)',
+                            'rgba(118, 75, 162, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(118, 75, 162, 1)'
+                        ],
+                        borderRadius: 8,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Resource functions
+        function openResource(key) {
+            const resource = resources[key];
+            document.getElementById('resourceTitle').textContent = resource.title;
+            document.getElementById('resourceContent').innerHTML = resource.content;
+            openModal('resourceModal');
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            if (modalId === 'editProfileModal') {
+                document.getElementById('childNameInput').value = appData.childName;
+                document.getElementById('childAgeInput').value = appData.childAge;
+            }
+            if (modalId === 'editPathologiesModal') {
+                updatePathologyList();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function saveProfile(event) {
+            event.preventDefault();
+            appData.childName = document.getElementById('childNameInput').value;
+            appData.childAge = parseInt(document.getElementById('childAgeInput').value);
+            saveData();
+            updateDisplay();
+            closeModal('editProfileModal');
+            alert('✅ Profil mis à jour!');
+        }
+
+        function addPathologyTag() {
+            const input = document.getElementById('newPathologyInput');
+            const value = input.value.trim();
+            
+            if (value && !appData.pathologies.includes(value)) {
+                appData.pathologies.push(value);
+                input.value = '';
+                updatePathologyList();
+            }
+        }
+
+        function updatePathologyList() {
+            const list = document.getElementById('pathologyTagsList');
+            list.innerHTML = appData.pathologies.map(p => `
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; background: #DBEAFE; padding: 8px 12px; border-radius: 8px;">
+                    <span>${p}</span>
+                    <button type="button" style="background: none; border: none; cursor: pointer; color: #1E40AF;" onclick="removePathologyTag('${p}')">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function removePathologyTag(tag) {
+            appData.pathologies = appData.pathologies.filter(p => p !== tag);
+            updatePathologyList();
+        }
+
+        function savePathologies(event) {
+            event.preventDefault();
+            saveData();
+            updateDisplay();
+            closeModal('editPathologiesModal');
+            alert('✅ Handicaps mis à jour!');
         }
 
         // Tab switching
@@ -971,147 +1338,27 @@
             
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
+
+            if (tabName === 'progress') {
+                setTimeout(() => updateChart(), 100);
+            }
         }
 
-        // Mood selection
         function setMood(mood) {
             appData.mood = mood;
             saveData();
-            
-            document.querySelectorAll('.mood-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
             event.target.closest('.mood-btn').classList.add('active');
-        }
-
-        // Modal functions
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        function openEditProfile() {
-            document.getElementById('childNameInput').value = appData.childName;
-            document.getElementById('childAgeInput').value = appData.childAge;
-            openModal('editProfileModal');
-        }
-
-        function saveProfile(event) {
-            event.preventDefault();
-            appData.childName = document.getElementById('childNameInput').value;
-            appData.childAge = parseInt(document.getElementById('childAgeInput').value);
-            saveData();
-            updateDisplay();
-            closeModal('editProfileModal');
-            showAlert('✅ Profil mis à jour!');
-        }
-
-        function openEditPathologies() {
-            openModal('editPathologiesModal');
-        }
-
-        function addPathologyTag() {
-            const input = document.getElementById('newPathology');
-            const value = input.value.trim();
-            
-            if (value && !appData.pathologies.includes(value)) {
-                appData.pathologies.push(value);
-                input.value = '';
-                updatePathologyList();
-            }
-        }
-
-        function removePathologyTag(button) {
-            const tagText = button.parentElement.textContent.replace('✕', '').trim();
-            appData.pathologies = appData.pathologies.filter(p => p !== tagText);
-            updatePathologyList();
-        }
-
-        function updatePathologyList() {
-            const list = document.getElementById('pathologyTagsList');
-            list.innerHTML = appData.pathologies.map(p => 
-                `<div class="pathology-tag-edit">
-                    ${p}
-                    <button type="button" class="remove-btn" onclick="removePathologyTag(this)">✕</button>
-                </div>`
-            ).join('');
-        }
-
-        function savePathologies(event) {
-            event.preventDefault();
-            saveData();
-            updateDisplay();
-            closeModal('editPathologiesModal');
-            showAlert('✅ Handicaps mis à jour!');
-        }
-
-        // Document functions
-        function addDocument(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const now = new Date();
-                const date = now.toLocaleDateString('fr-FR');
-                appData.documents.push({ name: file.name, date: date });
-                saveData();
-                showAlert('✅ Document ajouté!');
-            }
-        }
-
-        function shareDocument() {
-            showAlert('🔗 Lien de partage copié!');
-        }
-
-        function deleteDocument() {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce document?')) {
-                showAlert('✅ Document supprimé!');
-            }
-        }
-
-        function addSharedParent() {
-            const email = document.getElementById('parentEmail').value;
-            if (email && !appData.sharedWith.includes(email)) {
-                appData.sharedWith.push(email);
-                saveData();
-                document.getElementById('parentEmail').value = '';
-                showAlert('✅ Parent ajouté!');
-            }
-        }
-
-        function removeAccess() {
-            if (confirm('Retirer l\'accès à ce parent?')) {
-                showAlert('✅ Accès retiré!');
-            }
-        }
-
-        // Settings functions
-        function toggleNotifications() {
-            showAlert('🔔 Notifications modifiées!');
-        }
-
-        function changeLanguage() {
-            showAlert('🌐 Langue: Français');
-        }
-
-        function changeTheme() {
-            showAlert('🌙 Thème: Clair');
         }
 
         function logout() {
             if (confirm('Êtes-vous sûr de vouloir vous déconnecter?')) {
-                showAlert('👋 À bientôt!');
+                alert('👋 À bientôt!');
             }
-        }
-
-        function showAlert(message) {
-            alert(message);
         }
 
         // Initialize
         loadData();
-        updateDisplay();
     </script>
 </body>
 </html>
